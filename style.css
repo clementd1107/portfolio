@@ -3,11 +3,11 @@
 }
 
 .titre_veille {
-    color: #6E6C99;
+    color: #6A567B;
 }
 
 .realisations_professionnelles {
-    color: #6E6C99;    
+    color: #6A567B;    
 }
 
 /* Paragraphes */
@@ -17,10 +17,15 @@ p {
     font-weight: 500;
 }
 
-/* Titres H1 en couleur */
+/* Titres */
 h1 {
     color: #18191B;
     font-weight: 700;
+}
+
+.sous-titres_frise {
+    /* color: #996C80; */
+    color: #58567B;
 }
 
 /* Bouton d'acceuil */
@@ -34,7 +39,13 @@ h1 {
     font-weight: 600;
 }
 
-/* Timeline */
+/* Liens navigation */
+.lien-nav {
+    color: #633974;
+}
+
+
+/* TIMELINE */
 body{margin-top:20px;}
 .timeline {
     border-left: 3px solid #6E6C99;
