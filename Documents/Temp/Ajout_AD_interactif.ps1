@@ -46,34 +46,33 @@ New-ADGroup -Name "$Group_name" `
 #-----------------------------------------
 
 #Récupération des valeurs :
-$User_name = Read-Host "Nom de l'utilsateur "
 $User_givenname = Read-Host "Prénom "
 $User_surname = Read-Host "Nom de famille "
-$User_samaccoutname = Read-Host "SamAccountName "
-$User_principal_name = Read-Host "Principal name "
+$User_samaccountname = Read-Host "Identifiant de connexion (Ex : jdupont) "
+$User_principal_name = Read-Host "Identifiant de connexion (Ex : jdupont@entreprise.local) "
 $User_path = Read-Host "Destination sous la forme -> OU=nom_OU,DC=nom_de_domaine,DC=TLD "
 $User_pass = Read-Host "Donner un mot de passe " -AsSecureString
 
 $Input_enable = Read-Host "Activer le compte ? ([O]ui / [N]on) "
-$User_enable  = $true
-if ($Input_enable -eq "N"){$User_enable = $false}
+$User_enable  = $false
+if ($Input_enable -eq "O"){$User_enable = $true}
 
-$Input_change_pass = Read-Host "L'utilisateur devra chnager de mot de passe à la 1ère connexion ? ([O]ui / [N]on) "
-$User_change_pass  = $true
-if ($Input_change_pass -eq "N"){$User_change_pass = $false}
+$Input_change_pass = Read-Host "L'utilisateur devra changer de mot de passe à la 1ère connexion ? ([O]ui / [N]on) "
+$User_change_pass  = $false
+if ($Input_change_pass -eq "O"){$User_change_pass = $true}
 
 $Input_pass_never_expire = Read-Host "Le mot de passe n'expire jamais ? ([O]ui / [N]on) "
 $User_pass_never_expire  = $false
 if ($Input_pass_never_expire -eq "O"){$User_pass_never_expire = $true}
 
 #Création du user
-New-ADUser -Name "$User_name" `
-    -GivenName "$User_givenname" `
-    -Surname "$User_surname" `
-    -SamAccountName "$User_samaccoutname" `
-    -UserPrincipalName "$User_principal_name" `
-    -Path "$User_path " `
-    -AccountPassword "$User_pass" `
-    -Enabled "$User_enable" `
-    -ChangePasswordAtLogon "$User_change_pass" `
-    -PasswordNeverExpires "$User_pass_never_expire"
+New-ADUser -Name "$User_givenname $User_surname" `
+    -GivenName $User_givenname `
+    -Surname $User_surname `
+    -SamAccountName $User_samaccountname `
+    -UserPrincipalName $User_principal_name `
+    -Path $User_path `
+    -AccountPassword $User_pass `
+    -Enabled $User_enable `
+    -ChangePasswordAtLogon $User_change_pass `
+    -PasswordNeverExpires $User_pass_never_expire
