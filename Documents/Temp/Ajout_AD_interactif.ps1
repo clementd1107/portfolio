@@ -10,6 +10,7 @@ $OU_protected = $true
 if($Input_protected -eq "N"){$OU_protected = $false}
 
 #Création de l'OU :
+Write-Host "Création de l'OU..." -ForegroundColor Green
 New-ADOrganizationalUnit -Name "$OU_name" `
     -Path "$OU_path" `
     -ProtectedFromAccidentalDeletion $OU_protected
@@ -35,6 +36,7 @@ elseif($Input_scope -eq "U"){$Group_scope = "Universal"}
 else{$Group_scope = "Global"}
 
 #Création du groupe :
+Write-Host "Création du groupe..." -ForegroundColor Green
 New-ADGroup -Name "$Group_name" `
     -Path "$Group_path" `
     -GroupCategory "$Group_type" `
@@ -66,6 +68,7 @@ $User_pass_never_expire  = $false
 if ($Input_pass_never_expire -eq "O"){$User_pass_never_expire = $true}
 
 #Création du user
+Write-Host "Création de l'utilisateur..." -ForegroundColor Green
 New-ADUser -Name "$User_givenname $User_surname" `
     -GivenName $User_givenname `
     -Surname $User_surname `
