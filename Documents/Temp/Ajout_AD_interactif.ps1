@@ -9,16 +9,23 @@
 $OU_name = Read-Host "Nom de l'OU "
 $OU_name_exist = Get-ADObject -Filter "Name -eq '$OU_name'" -ErrorAction SilentlyContinue
 if($OU_name_exist){
-    Write-Host "Attention ! L'OU '$OU_name' existe déjà dans : " -ForegroundColor Yellow -NoNewline
-    Write-Host $OU_name_exist.DistinguishedName -ForegroundColor Cyan
+    Write-Host "Attention ! Ce nom d'OU a déjà été utilsé aileurs : " -ForegroundColor Yellow -NoNewline
+    foreach ($obj in $OU_name_exist) {
+        Write-Host " -> $($obj.DistinguishedName)" -ForegroundColor Cyan
+    }
+    Pause
 }
-# Path (bloc à vérifier)
-$OU_valid_path = $false
-while (-not $OU_valid_path) {
-    $OU_path = Read-Host "Destination sous la forme d'un DN -> DC=nom_de_domaine,DC=TLD (Exemples de TLD: com/fr/local) "
-    if(Get-ADObject -Identity $OU_path -ErrorAction SilentlyContinue){Write-Host "L'emplacement '$OU_path' est déjà utilisé..." -ForegroundColor Yellow}
-    else {$OU_valid_path = $true}
+# Path
+$domain_name = @(Get-ADDomain | Select-Object @{Name="Name"; Expression={$_.Name}}, @{Name="DistinguishedName"; Expression={$_.DistinguishedName}})
+$All_OU = Get-ADOrganizationalUnit -Filter * | Select-Object Name, DistinguishedName
+$selection_list = $domain_name + $All_OU
+$selected_path = $selection_list | Out-GridView -Title "Choisissez l'emplacement de destination" -OutputMode Single
+if ($null -eq $selected_path) {
+    Write-Host "Annulé par l'utilisateur." -ForegroundColor Yellow
+    exit
 }
+$OU_path = $selected_path.DistinguishedName
+Write-Host "Destination retenue : $OU_path" -ForegroundColor Green
 # Suppression accidentelle
 $Input_protected = Read-Host "Protéger contre la suppression accidentelle ? ([O]ui / [N]on)"
 $OU_protected = $true
@@ -36,26 +43,38 @@ Write-Host "Création de l'OU..." -ForegroundColor DarkYellow
 New-ADOrganizationalUnit @OU_params
 Write-Host "Création de l'OU terminée !" -ForegroundColor Green
 
-
+Pause
 #-------------------------------------
 # CREATION D'UN NOUVEAU GROUPE AD :
 #-------------------------------------
 
 #Récupération des valeurs :
 # Name
-$Group_name = Read-Host "Nom de l'OU "
-$Group_name_exist = Get-ADObject -Filter "Name -eq '$Group_name'" -ErrorAction SilentlyContinue
-if($Group_name_exist){
-    Write-Host "Attention ! Le groupe '$Group_name' existe déjà dans : " -ForegroundColor Yellow -NoNewline
-    Write-Host $Group_name_exist.DistinguishedName -ForegroundColor Cyan
+$Group_valid_name = $false
+while ($Group_valid_name -eq $false) {
+    $Group_name = Read-Host "Nom du Groupe "
+    $Group_name_exist = Get-ADObject -Filter "Name -eq '$Group_name'" -ErrorAction SilentlyContinue
+    if($Group_name_exist){
+        Write-Host "Attention ! Le groupe '$Group_name' existe déjà : " -ForegroundColor Red -NoNewline
+        Write-Host $Group_name_exist.DistinguishedName -ForegroundColor Cyan
+        Write-Host "Veuillez choisir un autre nom de Groupe " -ForegroundColor Yellow
+    }
+    else {
+        $Group_valid_name = $true
+    }
 }
-# Path (bloc à vérifier)
-$Group_valid_path = $false
-while (-not $Group_valid_path) {
-    $Group_path = Read-Host "Destination sous la forme d'un DN -> OU=nom_OU,DC=nom_de_domaine,DC=TLD (Exemples de TLD: com/fr/local) "
-    if(Get-ADObject -Identity $Group_path -ErrorAction SilentlyContinue){Write-Host "L'emplacement '$Group_path' est déjà utilisé..." -ForegroundColor Yellow}
-    else {$OU_valid_path = $true}
+
+Write-Host "Récupération des emplacements disponibles..." -ForegroundColor Gray
+$domain_name = @(Get-ADDomain | Select-Object @{Name="Name"; Expression={$_.Name}}, @{Name="DistinguishedName"; Expression={$_.DistinguishedName}})
+$All_OU = Get-ADOrganizationalUnit -Filter * | Select-Object Name, DistinguishedName
+$selection_list = $domain_name + $All_OU
+$selected_path = $selection_list | Out-GridView -Title "Sélectionnez l'OU de destination pour le groupe" -OutputMode Single
+if ($null -eq $selected_path) {
+    Write-Host "Annulé. Sortie du script." -ForegroundColor Red
+    exit
 }
+$Group_path = $selected_path.DistinguishedName
+Write-Host "Destination retenue : $Group_path" -ForegroundColor Cyan
 # Type de Groupe
 $Input_type = Read-Host "Groupe de [S]écurité ou [D]istribution (par défaut S)? "
 $Group_type = "Security"
@@ -81,7 +100,7 @@ Write-Host "Création du groupe..." -ForegroundColor DarkYellow
 New-ADGroup @Group_params
 Write-Host "Création du groupe terminée !" -ForegroundColor Green
 
-
+Pause
 #-----------------------------------------
 # CREATION D'UN NOUVEL UTILISATEUR AD :
 #-----------------------------------------
