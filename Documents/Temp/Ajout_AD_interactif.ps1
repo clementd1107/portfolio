@@ -106,21 +106,34 @@ Pause
 #-----------------------------------------
 
 #Récupération des valeurs :
+# Name
 $User_givenname = Read-Host "Prénom "
 $User_surname = Read-Host "Nom de famille "
+# Identifiants
 $User_samaccountname = Read-Host "Identifiant de connexion (Ex : jdupont) "
 $User_principal_name = Read-Host "Identifiant de connexion (Ex : jdupont@entreprise.local) "
-$User_path = Read-Host "Destination sous la forme d'un DN -> OU=nom_OU,DC=nom_de_domaine,DC=TLD (Exemples de TLD: com/fr/local) "
+# Path
+$domain_name = @(Get-ADDomain | Select-Object @{Name="Name"; Expression={$_.Name}}, @{Name="DistinguishedName"; Expression={$_.DistinguishedName}})
+$All_OU = Get-ADOrganizationalUnit -Filter * | Select-Object Name, DistinguishedName
+$selection_list = $domain_name + $All_OU
+$selected_path = $selection_list | Out-GridView -Title "Choisissez l'emplacement de destination" -OutputMode Single
+if ($null -eq $selected_path) {
+    Write-Host "Annulé par l'utilisateur." -ForegroundColor Yellow
+    exit
+}
+$OU_path = $selected_path.DistinguishedName
+Write-Host "Destination retenue : $OU_path" -ForegroundColor Green
+# Mot de passe
 $User_pass = Read-Host "Donner un mot de passe " -AsSecureString
-
+# Compte activé
 $Input_enable = Read-Host "Activer le compte ? ([O]ui / [N]on) "
 $User_enable  = $false
 if ($Input_enable -eq "O"){$User_enable = $true}
-
+# Changer le mdp à la 1ère connexion
 $Input_change_pass = Read-Host "L'utilisateur devra changer de mot de passe à la 1ère connexion ? ([O]ui / [N]on) "
-$User_change_pass  = $false
-if ($Input_change_pass -eq "O"){$User_change_pass = $true}
-
+$User_change_pass  = $true
+if ($Input_change_pass -eq "N"){$User_change_pass = $false}
+# Mdp n'expire jamais
 $Input_pass_never_expire = Read-Host "Le mot de passe n'expire jamais ? ([O]ui / [N]on) "
 $User_pass_never_expire  = $false
 if ($Input_pass_never_expire -eq "O"){$User_pass_never_expire = $true}
