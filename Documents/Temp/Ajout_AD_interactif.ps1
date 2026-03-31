@@ -1,8 +1,13 @@
 # Ajouter une option de création en masse d'utilisateur à partir d'un fichier .csv
 
-#--------------------------------------------------------
-# CREATION D'UNE NOUVELLE UNITE ORGANISATIONNELLE AD :
-#--------------------------------------------------------
+$Header_OU = @"
+    #--------------------------------------------------------
+    # CREATION D'UNE NOUVELLE UNITE ORGANISATIONNELLE AD :
+    #--------------------------------------------------------
+"@
+
+
+Write-Host $Header_OU -ForegroundColor DarkMagenta
 
 #Récupération des valeurs :
 # Name
@@ -42,11 +47,15 @@ $OU_params = @{
 Write-Host "Création de l'OU..." -ForegroundColor DarkYellow
 New-ADOrganizationalUnit @OU_params
 Write-Host "Création de l'OU terminée !" -ForegroundColor Green
-
 Pause
-#-------------------------------------
-# CREATION D'UN NOUVEAU GROUPE AD :
-#-------------------------------------
+
+$Header_group = @"
+    #-------------------------------------
+    # CREATION D'UN NOUVEAU GROUPE AD :
+    #-------------------------------------
+"@
+
+Write-Host $Header_group -ForegroundColor DarkMagenta
 
 #Récupération des valeurs :
 # Name
@@ -99,11 +108,16 @@ $Group_params = @{
 Write-Host "Création du groupe..." -ForegroundColor DarkYellow
 New-ADGroup @Group_params
 Write-Host "Création du groupe terminée !" -ForegroundColor Green
-
 Pause
-#-----------------------------------------
-# CREATION D'UN NOUVEL UTILISATEUR AD :
-#-----------------------------------------
+
+$Header_user = @"
+    #-----------------------------------------
+    # CREATION D'UN NOUVEL UTILISATEUR AD :
+    #-----------------------------------------
+"@
+
+Write-Host $Header_user -ForegroundColor DarkMagenta
+
 
 #Récupération des valeurs :
 # Name
@@ -121,8 +135,8 @@ if ($null -eq $selected_path) {
     Write-Host "Annulé par l'utilisateur." -ForegroundColor Yellow
     exit
 }
-$OU_path = $selected_path.DistinguishedName
-Write-Host "Destination retenue : $OU_path" -ForegroundColor Green
+$User_path = $selected_path.DistinguishedName
+Write-Host "Destination retenue : $User_path" -ForegroundColor Green
 # Mot de passe
 $User_pass = Read-Host "Donner un mot de passe " -AsSecureString
 # Compte activé
@@ -156,3 +170,4 @@ $User_params = @{
 Write-Host "Création de l'utilisateur..." -ForegroundColor DarkYellow
 New-ADUser @User_params
 Write-Host "Création de l'utilisateur terminée !" -ForegroundColor Green
+Pause
