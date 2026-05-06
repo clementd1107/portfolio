@@ -2,6 +2,17 @@
     background-color: #ffffff;
 }
 
+.pdf{
+    padding-top: 20px;
+    max-width: 49%;
+}
+
+.image-center{
+    max-width: 100%;
+    /* margin-inline: auto; */
+    justify-content: center;
+}
+
 /* body {
     background-color: #FFFDF2;
 } */
